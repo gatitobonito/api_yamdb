@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
@@ -53,6 +52,27 @@ def get_jwt_token(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    lookup_field = 'username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['user__username', ]
+    #permission_classes = [permissions.IsAuthenticated],
+    @action(methods=['patch', 'get'],
+            #permission_classes=[permissions.IsAuthenticated],
+            detail=False,
+            url_path='me',
+            )
+    def edit_profile(self, request):
+        user = self.request.user
+        if self.request.method == 'GET':
+            serializer = self.get_serializer(user)
+        if self.request.method == 'PATCH':
+            serializer = self.get_serializer(user,
+                                             data=request.data,
+                                             partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

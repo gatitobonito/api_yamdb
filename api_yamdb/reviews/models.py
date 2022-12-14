@@ -1,9 +1,10 @@
 from datetime import datetime
 from django.db import models
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, RegexValidator
 
 
 class Category(models.Model):
+    SLUG_VALIDATOR = RegexValidator(r'^[-a-zA-Z0-9_]+$')
     name = models.CharField(
         unique=True,
         max_length=250,
@@ -12,6 +13,7 @@ class Category(models.Model):
     slug = models.SlugField(
         max_length=50,
         unique=True,
+        validators=[SLUG_VALIDATOR]
     )
 
     class Meta:
@@ -23,6 +25,7 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
+    SLUG_VALIDATOR = RegexValidator(r'^[-a-zA-Z0-9_]+$')
     name = models.CharField(
         unique=True,
         max_length=250,
@@ -31,6 +34,7 @@ class Genre(models.Model):
     slug = models.SlugField(
         max_length=50,
         unique=True,
+        validators=[SLUG_VALIDATOR]
     )
 
     class Meta:

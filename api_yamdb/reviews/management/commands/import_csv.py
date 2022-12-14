@@ -48,7 +48,7 @@ class Command(BaseCommand):
             open('./static/data/genre.csv')
         ):
             genre = Genre(
-                name=row['name'].encode('utf-8'),
+                name=row['name'],
                 slug=row['slug']
             )
             genre.save()
@@ -69,7 +69,7 @@ class Command(BaseCommand):
         ):
             category = Category(
                 id=row['id'],
-                name=row['name'].encode('utf-8'),
+                name=row['name'],
                 slug=row['slug']
             )
             category.save()
@@ -114,9 +114,9 @@ class Command(BaseCommand):
         ):
             title = Title(
                 id=row['id'],
-                name=row['name'].encode('utf-8'),
+                name=row['name'],
                 year=row['year'],
-                category_id=row['category'].encode('utf-8')
+                category_id=row['category']
             )
             title.save()
 

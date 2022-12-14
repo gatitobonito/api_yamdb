@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from users.models import User
-from ..reviews.models import Category, Genre, Title, TitleGenre
+from reviews.models import Category, Genre, Title, TitleGenre
 
 
 class UserEmailRegistration(serializers.Serializer):

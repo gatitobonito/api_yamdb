@@ -10,8 +10,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import LimitOffsetPagination
 
 from reviews.models import Category, Genre, Title
-from serializers import CategorySerializer, GenreSerializer, TitleSerializer
-from filters import TitleFilter
+from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
+from .filters import TitleFilter
 from users.models import User
 from .serializers import UserSerializer, UserConfirmation, UserEmailRegistration
 

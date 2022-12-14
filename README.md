@@ -1,5 +1,6 @@
 # api_yamdb
 api_yamdb
+
 ### Как запустить проект:
 
 Клонировать репозиторий и перейти в него в командной строке:
@@ -30,3 +31,4 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
+

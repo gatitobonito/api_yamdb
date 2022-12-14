@@ -10,7 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import LimitOffsetPagination
 
 from reviews.models import Category, Genre, Title
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
+from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, TitleSerializerCrUpDel
 from .filters import TitleFilter
 from users.models import User
 from .serializers import UserSerializer, UserConfirmation, UserEmailRegistration
@@ -31,6 +31,7 @@ def send_confirmation_code(request):
     return Response(serializer.data,
                     status=status.HTTP_200_OK)
 
+
 @api_view(["POST"])
 def get_jwt_token(request):
     serializer = UserConfirmation(data=request.data)
@@ -48,9 +49,11 @@ def get_jwt_token(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -75,3 +78,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
     queryset = Title.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PATCH']:
+            return TitleSerializerCrUpDel
+        return TitleSerializer

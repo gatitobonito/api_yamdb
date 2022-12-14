@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from users.models import User
-from reviews.models import Category, Genre, Title, TitleGenre
+from reviews.models import Category, Genre, Title
 
 
 class UserEmailRegistration(serializers.Serializer):
@@ -20,7 +20,9 @@ class UserConfirmation(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'bio', 'role')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'bio',
+                  'role')
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,38 +45,13 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'year', 'description', 'genre', 'category']
 
-    def create(self, validated_data):
-        if 'genre' not in self.initial_data:
-            title = Title.objects.create(**validated_data)
-            return title
-        else:
-            genres = validated_data.pop('genre')
-            title = Title.objects.create(**validated_data)
-            for genre in genres:
-                current_genre, status = Genre.objects.get_or_create(
-                    **genre
-                )
-                TitleGenre.objects.create(
-                    genre=current_genre, title=title
-                )
-            return title
 
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.year = validated_data.get('year', instance.yearr)
-        instance.description = validated_data.get(
-            'description', instance.description
-        )
-        if 'genre' in validated_data:
-            genre_data = validated_data.pop('genre')
-            lst = []
-            for genre in genre_data:
-                current_genre, status = Genre.objects.get_or_create(
-                    **genre
-                )
-                lst.append(current_genre)
-            instance.genre.set(lst)
+class TitleSerializerCrUpDel(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(), slug_field='slug', many=True)
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(), slug_field='slug')
 
-        instance.save()
-        return instance
-
+    class Meta:
+        model = Title
+        fields = ['id', 'name', 'year', 'description', 'genre', 'category']

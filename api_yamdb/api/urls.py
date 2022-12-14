@@ -7,9 +7,9 @@ from .views import CategoryViewSet, GenreViewSet, TitleViewSet
 
 v1_router = DefaultRouter()
 v1_router.register(r'users', UserViewSet)
-v1_router.register(r'category', CategoryViewSet)
-v1_router.register(r'genre', GenreViewSet)
-v1_router.register(r'title', TitleViewSet)
+v1_router.register(r'categories', CategoryViewSet)
+v1_router.register(r'genres', GenreViewSet)
+v1_router.register(r'titles', TitleViewSet)
 
 urlpatterns = [
     path('v1/', include(v1_router.urls)),

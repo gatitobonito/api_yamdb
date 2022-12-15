@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-from .models import Comment, Review, Title
+from reviews.models import Comment, Review, Title
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .serializers import CommentSerializer, ReviewSerializer
 

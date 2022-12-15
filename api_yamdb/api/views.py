@@ -15,8 +15,8 @@ from .permissions import IsAdmin, IsAdminOrReadOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleSerializer,
                           TitleSerializerCrUpDel,
-                          UserSerializer, UserConfirmation,
-                          UserEmailRegistration)
+                          UserSerializer, UserEditSerializer,
+                          UserConfirmation, UserEmailRegistration)
 
 
 @api_view(['POST'])
@@ -26,7 +26,7 @@ def send_confirmation_code(request):
     email = serializer.data.get('email')
     user = User.objects.get_or_create(email=email)
     confirmation_code = default_token_generator.make_token(user)
-    send_mail("YaMDb registration",
+    send_mail("registration",
               f'Your confirmation code: {confirmation_code}',
               'admin@yamb.com',
               [email],
@@ -58,11 +58,14 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username', ]
+    # search_fields = ['user__username', ]
+    search_fields = ('username',)
     permission_classes = (IsAdmin,)
+    pagination_class = LimitOffsetPagination
 
     @action(methods=['patch', 'get'],
             permission_classes=[permissions.IsAuthenticated],
+            serializer_class=UserEditSerializer,
             detail=False,
             url_path='me',
             )

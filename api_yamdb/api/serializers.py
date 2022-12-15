@@ -16,11 +16,19 @@ class UserConfirmation(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'bio',
                   'role')
 
+
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("username", "email", "first_name",
+                  "last_name", "bio", "role")
+        model = User
+        read_only_fields = ('role',)
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

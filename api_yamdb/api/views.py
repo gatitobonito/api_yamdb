@@ -9,10 +9,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import LimitOffsetPagination
 
 from reviews.models import Category, Genre, Title
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, TitleSerializerCrUpDel
-from .filters import TitleFilter
 from users.models import User
-from .serializers import UserSerializer, UserConfirmation, UserEmailRegistration
+from .filters import TitleFilter
+from .permissions import IsAdmin, IsAdminOrReadOnly
+from .serializers import (CategorySerializer, GenreSerializer,
+                          TitleSerializer,
+                          TitleSerializerCrUpDel,
+                          UserSerializer, UserConfirmation,
+                          UserEmailRegistration)
 
 
 @api_view(['POST'])
@@ -41,7 +45,7 @@ def get_jwt_token(request):
     )
 
     if default_token_generator.check_token(
-        user, serializer.validated_data["confirmation_code"]
+            user, serializer.validated_data["confirmation_code"]
     ):
         token = AccessToken.for_user(user)
         return Response({"token": str(token)}, status=status.HTTP_200_OK)
@@ -55,9 +59,10 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['user__username', ]
-    #permission_classes = [permissions.IsAuthenticated],
+    permission_classes = (IsAdmin,)
+
     @action(methods=['patch', 'get'],
-            #permission_classes=[permissions.IsAuthenticated],
+            permission_classes=[permissions.IsAuthenticated],
             detail=False,
             url_path='me',
             )
@@ -74,11 +79,10 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    # permission_classes
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name',)
 
@@ -86,14 +90,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    # permission_classes
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name',)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
-    # permission_classes
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter

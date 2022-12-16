@@ -60,13 +60,11 @@ class Title(models.Model):
     )
     description = models.TextField(
         blank=True,
-        null=True,
         verbose_name='Описание'
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
-        blank=True,
         null=True,
         related_name='category',
     )
@@ -84,8 +82,8 @@ class Title(models.Model):
 
 
 class TitleGenre(models.Model):
-    title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
+    title = models.ForeignKey(Title, db_column='title_id', on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, db_column='genre_id',  on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.title} {self.genre}'

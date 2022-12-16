@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'api',
     'reviews',
     'rest_framework',
+    'import_export',
     'django_filters',
 ]
 
@@ -125,5 +126,6 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticimport')
 
 AUTH_USER_MODEL = 'users.User'

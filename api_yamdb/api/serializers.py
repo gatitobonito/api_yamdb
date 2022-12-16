@@ -112,13 +112,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='name',
         read_only=True,
     )
+
     class Meta:
         model = Review
-        fields = '__all__'
-
-    def get_rating(self, obj):
-        average = sum(obj.score) / len(obj.score)
-        return round(average, 0)
+        fields = [
+            'id', 'text', 'author', 'score', 'pub_date', 'title']
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -128,4 +126,5 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = [
+            'id', 'text', 'author', 'pub_date']

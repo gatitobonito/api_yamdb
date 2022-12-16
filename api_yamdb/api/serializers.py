@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.core.validators import RegexValidator
 
 from users.models import User
 from reviews.models import Category, Genre, Title
@@ -6,8 +7,9 @@ from reviews.models import Comment, Review
 
 
 class UserEmailRegistration(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
+    NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')
+    email = serializers.EmailField(required=True, max_length=254)
+    username = serializers.CharField(required=True, max_length=150, validators=[NAME_VALIDATOR])
 
     def validate_username(self, value):
         if value.lower() == 'me':

@@ -1,8 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CheckConstraint, F, Q, UniqueConstraint
-from django.core.validators import (MaxValueValidator, MinValueValidator,
-                                    RegexValidator)
+from django.core.validators import RegexValidator
 ROLES = (
     ('user', 'Пользователь'),
     ('moderator', 'Модератор'),

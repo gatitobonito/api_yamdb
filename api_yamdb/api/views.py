@@ -26,9 +26,6 @@ from reviews.models import Comment, Review, TitleGenre
 def send_confirmation_code(request):
     serializer = UserEmailRegistration(data=request.data)
     serializer.is_valid(raise_exception=True)
-    # serializer.save()
-    # email = serializer.data.get('email')
-    # user = User.objects.get_or_create(email=email)
     user = get_object_or_404(
         User,
         username=serializer.validated_data["username"]

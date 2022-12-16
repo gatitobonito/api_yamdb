@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
 from users.models import User
 from reviews.models import Category, Genre, Title
@@ -8,11 +7,6 @@ from reviews.models import Comment, Review
 
 class UserEmailRegistration(serializers.Serializer):
     email = serializers.EmailField(required=True)
-    # email = serializers.EmailField(required=True,
-    #     validators=[
-    #         UniqueValidator(queryset=User.objects.all())
-    #     ]
-    # )
     username = serializers.CharField(required=True)
 
     def validate_username(self, value):
@@ -24,7 +18,6 @@ class UserEmailRegistration(serializers.Serializer):
 class UserConfirmation(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
-
 
 class UserSerializer(serializers.ModelSerializer):
 

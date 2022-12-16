@@ -32,6 +32,7 @@ def send_confirmation_code(request):
               f'Your confirmation code: {confirmation_code}',
               'admin@yamb.com',
               [email],
+              fail_silently=False
               )
     return Response(serializer.data,
                     status=status.HTTP_200_OK)
@@ -64,7 +65,7 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     permission_classes = (IsAdmin,)
     pagination_class = LimitOffsetPagination
-
+    http_method_names = ['get', 'post', 'patch', 'delete']
     @action(methods=['patch', 'get'],
             permission_classes=[permissions.IsAuthenticated],
             serializer_class=UserEditSerializer,
@@ -83,6 +84,14 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    # def perform_update(self, serializer):
+    #     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    # def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    #     """Disallow full update (PUT) and allow partial update (PATCH)."""
+    #     if kwargs.get("partial", False):  # Use .get() instead of .pop()
+    #         return super().update(request, args, kwargs)
+    #
+    #     raise MethodNotAllowed(request.method)
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()

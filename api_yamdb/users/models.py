@@ -27,10 +27,4 @@ class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True,
                                 validators=[username_validator])
     email = models.EmailField(max_length=254, unique=True, blank=False)
-    @property
-    def is_admin(self):
-        return self.role == 'admin' or self.is_staff
 
-    @property
-    def is_moderator(self):
-        return self.role == 'moderator'

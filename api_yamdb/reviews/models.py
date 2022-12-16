@@ -60,7 +60,8 @@ class Title(models.Model):
     )
     description = models.TextField(
         blank=True,
-        verbose_name='Описание'
+        verbose_name='Описание',
+        null=True
     )
     category = models.ForeignKey(
         Category,
@@ -82,29 +83,34 @@ class Title(models.Model):
 
 
 class TitleGenre(models.Model):
-    title = models.ForeignKey(Title, db_column='title_id', on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genre, db_column='genre_id',  on_delete=models.CASCADE)
+    title_id = models.ForeignKey(Title, db_column='title_id', on_delete=models.CASCADE)
+    genre_id = models.ForeignKey(Genre, db_column='genre_id',  on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.title} {self.genre}'
+        return f'{self.title_id} {self.genre_id}'
 
 
 class Review(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews')
-    title = models.ForeignKey(
+    title_id = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name='reviews')
     score = models.IntegerField(range(1, 11))
     text = models.TextField()
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
 
+    def __str__(self):
+        return f'{self.title_id}, оценка: {self.score}'
 
 class Comment(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments')
-    review = models.ForeignKey(
+    review_id = models.ForeignKey(
         Review, db_column='review_id', on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return f'автор: {self.author}, коммент: {self.text}'

@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import CheckConstraint, F, Q, UniqueConstraint
 from django.core.validators import (MaxValueValidator, MinValueValidator,
                                     RegexValidator)
 ROLES = (
@@ -14,7 +15,7 @@ ROLES = (
 # )
 
 class User(AbstractUser):
-    username_validator = RegexValidator(r'^[\w.@+-]+')
+    NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')
     bio = models.TextField(
         blank=True,
     )
@@ -25,6 +26,16 @@ class User(AbstractUser):
     )
     confirmation_code = models.CharField(max_length=60, blank=True)
     username = models.CharField(max_length=150, unique=True,
-                                validators=[username_validator])
+                                validators=[NAME_VALIDATOR]
+                                )
     email = models.EmailField(max_length=254, unique=True, blank=False)
 
+    class Meta:
+        constraints = [
+            CheckConstraint(
+                name='username_not_me', check=~Q(username__iexact="me")
+            ),
+            # UniqueConstraint(
+            #     name='unique_user_email_pair', fields=['username', 'email']
+            # ),
+        ]

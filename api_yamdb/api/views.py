@@ -22,16 +22,22 @@ from .serializers import CommentSerializer, ReviewSerializer
 from reviews.models import Comment, Review, TitleGenre
 
 @api_view(['POST'])
+@permission_classes([permissions.AllowAny])
 def send_confirmation_code(request):
     serializer = UserEmailRegistration(data=request.data)
     serializer.is_valid(raise_exception=True)
-    email = serializer.data.get('email')
-    user = User.objects.get_or_create(email=email)
+    # serializer.save()
+    # email = serializer.data.get('email')
+    # user = User.objects.get_or_create(email=email)
+    user = get_object_or_404(
+        User,
+        username=serializer.validated_data["username"]
+    )
     confirmation_code = default_token_generator.make_token(user)
     send_mail("registration",
               f'Your confirmation code: {confirmation_code}',
               'admin@yamb.com',
-              [email],
+              [user.email],
               fail_silently=False
               )
     return Response(serializer.data,
@@ -39,6 +45,7 @@ def send_confirmation_code(request):
 
 
 @api_view(["POST"])
+@permission_classes([permissions.AllowAny])
 def get_jwt_token(request):
     serializer = UserConfirmation(data=request.data)
     serializer.is_valid(raise_exception=True)

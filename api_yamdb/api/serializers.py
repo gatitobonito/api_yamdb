@@ -5,10 +5,21 @@ from users.models import User
 from reviews.models import Category, Genre, Title
 from reviews.models import Comment, Review
 
+
 class UserEmailRegistration(serializers.Serializer):
     email = serializers.EmailField(required=True)
+    # email = serializers.EmailField(required=True,
+    #     validators=[
+    #         UniqueValidator(queryset=User.objects.all())
+    #     ]
+    # )
     username = serializers.CharField(required=True)
 
+    def validate_username(self, value):
+        if value.lower() == 'me':
+            raise serializers.ValidationError(
+                'Вы не можете зарегистрировать имя me')
+        return value
 
 class UserConfirmation(serializers.Serializer):
     username = serializers.CharField(required=True)

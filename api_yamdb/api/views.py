@@ -7,12 +7,12 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from reviews.models import Category, Genre, Title
 from users.models import User
 from .filters import TitleFilter
-from .permissions import IsAdmin, IsAdminOrReadOnly
+from .permissions import IsAdmin, IsAdminOrReadOnly, IsAdminModeratorAuthorOrReadOnly
+
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleSerializer,
                           TitleSerializerCrUpDel,
@@ -123,7 +123,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminModeratorAuthorOrReadOnly]
     queryset = Comment.objects.all()
     pagination_class = LimitOffsetPagination
 
@@ -134,7 +134,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminModeratorAuthorOrReadOnly]
     queryset = Review.objects.all()
     pagination_class = LimitOffsetPagination
 

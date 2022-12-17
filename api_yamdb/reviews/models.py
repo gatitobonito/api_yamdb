@@ -2,6 +2,8 @@ from datetime import datetime
 from django.db import models
 from django.core.validators import MaxValueValidator, RegexValidator
 
+from users.models import User
+
 
 class Category(models.Model):
     SLUG_VALIDATOR = RegexValidator(r'^[-a-zA-Z0-9_]+$')
@@ -88,3 +90,24 @@ class TitleGenre(models.Model):
 
     def __str__(self):
         return f'{self.title} {self.genre}'
+
+
+class Review(models.Model):
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='reviews')
+    score = models.IntegerField(range(1, 11))
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
+    review = models.ForeignKey(
+        Review, db_column='review_id', on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)

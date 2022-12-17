@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from reviews.models import Category, Genre, Title
 from users.models import User
@@ -15,27 +16,33 @@ from .permissions import IsAdmin, IsAdminOrReadOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleSerializer,
                           TitleSerializerCrUpDel,
-                          UserSerializer, UserConfirmation,
-                          UserEmailRegistration)
+                          UserSerializer, UserEditSerializer,
+                          UserConfirmation, UserEmailRegistration)
+from .serializers import CommentSerializer, ReviewSerializer
+from reviews.models import Comment, Review
 
 
 @api_view(['POST'])
+@permission_classes([permissions.AllowAny])
 def send_confirmation_code(request):
     serializer = UserEmailRegistration(data=request.data)
     serializer.is_valid(raise_exception=True)
-    email = serializer.data.get('email')
-    user = User.objects.get_or_create(email=email)
+    username = serializer.validated_data["username"]
+    email = serializer.validated_data["email"]
+    user, created = User.objects.get_or_create(username=username, email=email)
     confirmation_code = default_token_generator.make_token(user)
-    send_mail("YaMDb registration",
+    send_mail("registration",
               f'Your confirmation code: {confirmation_code}',
               'admin@yamb.com',
-              [email],
+              [user.email],
+              fail_silently=False
               )
     return Response(serializer.data,
                     status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
+@permission_classes([permissions.AllowAny])
 def get_jwt_token(request):
     serializer = UserConfirmation(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -58,11 +65,14 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username', ]
+    search_fields = ('username',)
     permission_classes = (IsAdmin,)
+    pagination_class = LimitOffsetPagination
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(methods=['patch', 'get'],
             permission_classes=[permissions.IsAuthenticated],
+            serializer_class=UserEditSerializer,
             detail=False,
             url_path='me',
             )
@@ -85,6 +95,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name',)
+    pagination_class = LimitOffsetPagination
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -93,6 +104,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name',)
+    pagination_class = LimitOffsetPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -101,8 +113,31 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
     queryset = Title.objects.all()
+    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
             return TitleSerializerCrUpDel
         return TitleSerializer
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Comment.objects.all()
+    pagination_class = LimitOffsetPagination
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, review=review)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Review.objects.all()
+    pagination_class = LimitOffsetPagination
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)

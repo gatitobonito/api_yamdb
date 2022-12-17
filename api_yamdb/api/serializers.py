@@ -1,13 +1,25 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
-
+from django.core.validators import RegexValidator
 from users.models import User
-from reviews.models import Category, Genre, Title
+from reviews.models import (Category, Comment, Genre, Title,
+                            Review)
 
 
 class UserEmailRegistration(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
+    NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')
+    email = serializers.EmailField(required=True,
+                                   max_length=254
+                                   )
+    username = serializers.CharField(required=True,
+                                     max_length=150,
+                                     validators=[NAME_VALIDATOR]
+                                     )
+
+    def validate_username(self, value):
+        if value.lower() == 'me':
+            raise serializers.ValidationError(
+                'Вы не можете зарегистрировать имя me')
+        return value
 
 
 class UserConfirmation(serializers.Serializer):
@@ -20,6 +32,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'bio',
                   'role')
+
+
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("username", "email", "first_name",
+                  "last_name", "bio", "role")
+        model = User
+        read_only_fields = ('role',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -41,7 +61,9 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = [
-            'id', 'name', 'year', 'description', 'genre', 'category']
+            'id', 'name', 'year', 'description',
+            'genre', 'category'
+        ]
 
 
 class TitleSerializerCrUpDel(serializers.ModelSerializer):
@@ -52,4 +74,33 @@ class TitleSerializerCrUpDel(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ['id', 'name', 'year', 'description', 'genre', 'category']
+        fields = ['id', 'name', 'year',
+                  'description', 'genre', 'category'
+                  ]
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+    title = serializers.SlugRelatedField(
+        slug_field='name',
+        read_only=True,
+    )
+
+    class Meta:
+        model = Review
+        fields = [
+            'id', 'text', 'author', 'score', 'pub_date', 'title']
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+
+    )
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'text', 'author', 'pub_date']

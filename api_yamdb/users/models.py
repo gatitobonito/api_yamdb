@@ -2,16 +2,12 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CheckConstraint, F, Q, UniqueConstraint
 from django.core.validators import RegexValidator
+
 ROLES = (
-    ('user', 'Пользователь'),
-    ('moderator', 'Модератор'),
-    ('admin', 'Администратор'),
+    ('user', 'user'),
+    ('moderator', 'moderator'),
+    ('admin', 'admin'),
 )
-# ROLES = (
-#     (ADMIN, 'administrator'),
-#     (MODERATOR, 'moderator'),
-#     (USER, 'user'),
-# )
 
 class User(AbstractUser):
     NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')
@@ -19,7 +15,7 @@ class User(AbstractUser):
         blank=True,
     )
     role = models.CharField(
-        max_length=16,
+        max_length=150,
         choices=ROLES,
         default='user'
     )

@@ -4,6 +4,7 @@ from django.core.validators import MaxValueValidator, RegexValidator
 
 from users.models import User
 
+
 class Category(models.Model):
     SLUG_VALIDATOR = RegexValidator(r'^[-a-zA-Z0-9_]+$')
     name = models.CharField(
@@ -114,3 +115,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'автор: {self.author}, коммент: {self.text}'
+

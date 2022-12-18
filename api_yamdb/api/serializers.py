@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.core.validators import RegexValidator
+from django.shortcuts import get_object_or_404
+
 from users.models import User
 from reviews.models import (Category, Comment, Genre, Title,
                             Review)
@@ -8,18 +10,35 @@ from reviews.models import (Category, Comment, Genre, Title,
 class UserEmailRegistration(serializers.Serializer):
     NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')
     email = serializers.EmailField(required=True,
-                                   max_length=254
+                                   max_length=254,
                                    )
     username = serializers.CharField(required=True,
                                      max_length=150,
                                      validators=[NAME_VALIDATOR]
                                      )
 
-    def validate_username(self, value):
-        if value.lower() == 'me':
+    def validate(self, value):
+        user1 = User.objects.filter(email=value['email'])
+        if user1.exists():
+            user2 = User.objects.filter(username=value['username'])
+            if not user2.exists():
+                raise serializers.ValidationError(
+                    'Вы не можете зарегистрировать другое имя')
+            # if get_object_or_404(User, email=value['email']).username != value['username']:
+            #     raise serializers.ValidationError(
+            #         'Вы не можете зарегистрировать другое имя')
+        if value['username'].lower() == 'me':
             raise serializers.ValidationError(
                 'Вы не можете зарегистрировать имя me')
         return value
+
+
+    # def validate_username(self, value):
+    #     if value.lower() == 'me':
+    #         raise serializers.ValidationError(
+    #             'Вы не можете зарегистрировать имя me')
+    #     return value
+
 
 
 class UserConfirmation(serializers.Serializer):

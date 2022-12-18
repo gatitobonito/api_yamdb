@@ -20,6 +20,7 @@ from .serializers import (CategorySerializer, GenreSerializer,
                           UserConfirmation, UserEmailRegistration)
 from .serializers import CommentSerializer, ReviewSerializer
 from reviews.models import Comment, Review
+from .mixins import CreateListDestroy
 
 
 @api_view(['POST'])
@@ -88,23 +89,24 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CreateListDestroy):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name',)
     pagination_class = LimitOffsetPagination
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CreateListDestroy):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name',)
     pagination_class = LimitOffsetPagination
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):

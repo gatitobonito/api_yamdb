@@ -1,27 +1,23 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, permissions, status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, permissions, serializers, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 from .filters import TitleFilter
-from .permissions import IsAdmin, IsAdminOrReadOnly
-from .permissions import IsAdminModeratorAuthorOrReadOnly
-
-from .serializers import (CategorySerializer, GenreSerializer,
-                          TitleSerializer,
-                          TitleSerializerCrUpDel,
-                          UserSerializer, UserEditSerializer,
-                          UserConfirmation, UserEmailRegistration)
-from .serializers import CommentSerializer, ReviewSerializer
-from reviews.models import Comment, Review
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
+                          IsAdminModeratorAuthorOrReadOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          TitleSerializer, TitleSerializerCrUpDel,
+                          UserEditSerializer, UserEmailRegistration,
+                          UserConfirmation, UserSerializer)
 from .mixins import CreateListDestroy
 
 
@@ -53,7 +49,6 @@ def get_jwt_token(request):
         User,
         username=serializer.validated_data["username"]
     )
-
     if default_token_generator.check_token(
             user, serializer.validated_data["confirmation_code"]
     ):

@@ -1,7 +1,8 @@
 from datetime import datetime
+from django.core.validators import (MaxValueValidator,
+                                    RegexValidator,
+                                    MinValueValidator)
 from django.db import models
-from django.core.validators import MaxValueValidator, RegexValidator
-from django.core.validators import MinValueValidator
 from django.db.models import Avg
 
 from users.models import User

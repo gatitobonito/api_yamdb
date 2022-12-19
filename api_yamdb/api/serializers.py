@@ -2,10 +2,9 @@ from rest_framework import serializers
 from django.core.validators import RegexValidator
 from django.db.models import Avg
 
-
+from reviews.models import (Category, Comment, Genre,
+                            Review, Title)
 from users.models import User
-from reviews.models import (Category, Comment, Genre, Title,
-                            Review)
 
 
 class UserEmailRegistration(serializers.Serializer):

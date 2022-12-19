@@ -17,5 +17,4 @@ class UserAdmin(ImportExportActionModelAdmin):
     resource_class = UserResource
 
 
-
 admin.site.register(User, UserAdmin)

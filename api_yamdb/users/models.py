@@ -1,13 +1,14 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import CheckConstraint, F, Q, UniqueConstraint
+from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.core.validators import RegexValidator
 
 ROLES = (
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin'),
+    ('user', 'Пользователь'),
+    ('moderator', 'Модератор'),
+    ('admin', 'Админ'),
 )
+
 
 class User(AbstractUser):
     NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')

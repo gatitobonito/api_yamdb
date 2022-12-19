@@ -40,7 +40,7 @@ class ReviewResource(resources.ModelResource):
         model = Review
         fields = (
             'id',
-            'title_id',
+            'title',
             'text',
             'author',
             'score',

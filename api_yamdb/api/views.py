@@ -7,11 +7,13 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import serializers
 
 from reviews.models import Category, Genre, Title
 from users.models import User
 from .filters import TitleFilter
-from .permissions import IsAdmin, IsAdminOrReadOnly, IsAdminModeratorAuthorOrReadOnly
+from .permissions import IsAdmin, IsAdminOrReadOnly
+from .permissions import IsAdminModeratorAuthorOrReadOnly
 
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleSerializer,
@@ -89,6 +91,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class CategoryViewSet(CreateListDestroy):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -141,5 +144,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
-        title_id = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        serializer.save(author=self.request.user, title_id=title_id)
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        review = Review.objects.filter(
+            title=title,
+            author=self.request.user)
+        if len(review) > 0:
+            raise serializers.ValidationError(
+                'Нельзя оставлять два отзыва к одному посту'
+            )
+        serializer.save(author=self.request.user, title=title)

@@ -30,7 +30,7 @@ class User(AbstractUser):
             CheckConstraint(
                 name='username_not_me', check=~Q(username__iexact="me")
             ),
-            # UniqueConstraint(
-            #     name='unique_user_email_pair', fields=['username', 'email']
-            # ),
+            UniqueConstraint(
+                name='unique_user_email_pair', fields=['username', 'email']
+            ),
         ]

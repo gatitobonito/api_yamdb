@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.core.validators import RegexValidator
+
 from users.models import User
 from reviews.models import (Category, Comment, Genre, Title,
                             Review)
@@ -8,15 +9,25 @@ from reviews.models import (Category, Comment, Genre, Title,
 class UserEmailRegistration(serializers.Serializer):
     NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')
     email = serializers.EmailField(required=True,
-                                   max_length=254
+                                   max_length=254,
                                    )
     username = serializers.CharField(required=True,
                                      max_length=150,
                                      validators=[NAME_VALIDATOR]
                                      )
 
-    def validate_username(self, value):
-        if value.lower() == 'me':
+    def validate(self, value):
+        user1 = User.objects.filter(email=value['email'])
+        if user1.exists():
+            if not User.objects.filter(username=value['username']).exists():
+                raise serializers.ValidationError(
+                    'Вы не можете зарегистрировать другое имя на эту почту')
+        user2 = User.objects.filter(username=value['username'])
+        if user2.exists():
+            if not User.objects.filter(email=value['email']).exists():
+                raise serializers.ValidationError(
+                    'Вы не можете зарегистрировать другую почту на это имя')
+        if value['username'].lower() == 'me':
             raise serializers.ValidationError(
                 'Вы не можете зарегистрировать имя me')
         return value

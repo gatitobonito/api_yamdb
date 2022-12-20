@@ -124,8 +124,14 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAdminModeratorAuthorOrReadOnly]
-    queryset = Comment.objects.all()
     pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        review = get_object_or_404(Review,
+                                   pk=self.kwargs['review_id'],
+                                   title__id=self.kwargs['title_id'])
+        queryset = Comment.objects.filter(review_id=review)
+        return queryset
 
     def perform_create(self, serializer):
         review_id = get_object_or_404(Review, id=self.kwargs.get('review_id'))
@@ -135,8 +141,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAdminModeratorAuthorOrReadOnly]
-    queryset = Review.objects.all()
     pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        """Возвращает запрос для отзыва."""
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        queryset = Review.objects.filter(title=title)
+        return queryset
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))

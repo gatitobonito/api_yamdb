@@ -119,6 +119,7 @@ class Review(models.Model):
                 name='unique_title_author'
             )
         ]
+        ordering = ['pub_date']
 
     def __str__(self):
         return f'{self.title}, оценка: {self.score}'
@@ -133,6 +134,9 @@ class Comment(models.Model):
     text = models.TextField()
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['pub_date']
 
     def __str__(self):
         return f'автор: {self.author}, коммент: {self.text}'

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportActionModelAdmin
 from import_export import resources
-from import_export.fields import Field 
+from import_export.fields import Field
 from import_export.widgets import ForeignKeyWidget
 
 from reviews.models import Category, Comment, Genre, Review, Title, TitleGenre
@@ -38,7 +38,9 @@ class TitleGenreResource(resources.ModelResource):
 
 
 class ReviewResource(resources.ModelResource):
-    title = Field(attribute='title', column_name='title_id', widget=ForeignKeyWidget(Title))
+    title = Field(attribute='title', column_name='title_id',
+                  widget=ForeignKeyWidget(Title)
+                  )
 
     class Meta:
         model = Review

@@ -108,12 +108,12 @@ class GenreViewSet(CreateListDestroy):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_class = TitleFilter
-    queryset = Title.objects.all()
-    pagination_class = LimitOffsetPagination
+    search_fields = ('name',)
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
@@ -137,6 +137,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminModeratorAuthorOrReadOnly]
     queryset = Review.objects.all()
     pagination_class = PageNumberPagination
+
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))

@@ -125,26 +125,39 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAdminModeratorAuthorOrReadOnly]
     queryset = Comment.objects.all()
-    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        """Возвращает запрос для комментариев."""
+        review = get_object_or_404(Review,
+                                   pk=self.kwargs['review_id'],
+                                   title__id=self.kwargs['title_id'])
+        queryset = Comment.objects.filter(review_id=review)
+        return queryset
 
     def perform_create(self, serializer):
-        review_id = get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        review_id = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review_id=review_id)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAdminModeratorAuthorOrReadOnly]
-    queryset = Review.objects.all()
-    pagination_class = LimitOffsetPagination
+    # queryset = Review.objects.all()
+
+    def get_queryset(self):
+        """Возвращает запрос для отзыва."""
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        queryset = Review.objects.filter(title=title)
+        return queryset
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        review = Review.objects.filter(
-            title=title,
-            author=self.request.user)
-        if len(review) > 0:
-            raise serializers.ValidationError(
-                'Нельзя оставлять два отзыва к одному посту'
-            )
+        # review = Review.objects.filter(
+        #     title=title,
+        #     author=self.request.user)
+        # # if len(review) > 0:
+        # if review.exists():
+        #     raise serializers.ValidationError(
+        #         'Нельзя оставлять два отзыва к одному посту'
+        #     )
         serializer.save(author=self.request.user, title=title)

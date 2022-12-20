@@ -112,6 +112,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'text', 'author', 'score', 'pub_date', 'title']
 
+    def validate(self, data):
+        """Пользователь может оставить только один отзыв на один объект."""
+        if self.context['request'].method == 'PATCH':
+            return data
+        user = self.context['request'].user
+        title = (self.context['request'].parser_context['kwargs']['title_id'])
+        if Review.objects.filter(author=user, title_id=title).exists():
+            raise serializers.ValidationError('Вы уже поставили оценку')
+        return data
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(

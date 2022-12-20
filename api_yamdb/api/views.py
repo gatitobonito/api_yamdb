@@ -115,7 +115,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilter
     search_fields = ('name',)
 
-
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
             return TitleSerializerCrUpDel
@@ -137,7 +136,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAdminModeratorAuthorOrReadOnly]
     queryset = Review.objects.all()
-
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))

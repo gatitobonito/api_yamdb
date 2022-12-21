@@ -4,6 +4,7 @@ from django.db.models import Avg
 
 from reviews.models import (Category, Comment, Genre,
                             Review, Title)
+from reviews.validators import validate_username
 from users.models import User
 
 
@@ -30,7 +31,7 @@ class UserEmailRegistration(serializers.Serializer):
                     'Вы не можете зарегистрировать другую почту на это имя')
         if value['username'].lower() == 'me':
             raise serializers.ValidationError(
-                'Вы не можете зарегистрировать имя me')
+                'Вы не можете зарегистрировать имя me/Me/ME/mE')
         return value
 
 
@@ -43,7 +44,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'bio',
-                  'role')
+                  'role'
+                  )
 
 
 class UserEditSerializer(serializers.ModelSerializer):
@@ -57,14 +59,14 @@ class UserEditSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['name', 'slug']
+        fields = ('name', 'slug')
         lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ['name', 'slug']
+        fields = ('name', 'slug')
         lookup_field = 'slug'
 
 
@@ -74,10 +76,10 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = [
+        fields = (
             'id', 'name', 'year', 'description',
             'genre', 'category', 'rating'
-        ]
+        )
 
     rating = serializers.SerializerMethodField()
 
@@ -93,9 +95,9 @@ class TitleSerializerCrUpDel(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ['id', 'name', 'year',
+        fields = ('id', 'name', 'year',
                   'description', 'genre', 'category'
-                  ]
+                  )
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -109,17 +111,18 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = [
-            'id', 'text', 'author', 'score', 'pub_date', 'title']
+        fields = (
+            'id', 'text', 'author',
+            'score', 'pub_date', 'title'
+        )
 
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
-
     )
 
     class Meta:
         model = Comment
-        fields = [
-            'id', 'text', 'author', 'pub_date']
+        fields = (
+            'id', 'text', 'author', 'pub_date')

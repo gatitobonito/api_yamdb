@@ -26,6 +26,14 @@ class User(AbstractUser):
                                 )
     email = models.EmailField(max_length=254, unique=True, blank=False)
 
+    @property
+    def is_admin(self):
+        self.role == 'admin'
+
+    @property
+    def is_moderator(self):
+        self.role == 'moderator'
+
     class Meta:
         constraints = [
             CheckConstraint(

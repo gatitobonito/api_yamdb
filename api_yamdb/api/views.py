@@ -127,8 +127,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        review = get_object_or_404(Review,
-                                   pk=self.kwargs['review_id'],
+        review = get_object_or_404(Review, pk=self.kwargs['review_id'],
                                    title__id=self.kwargs['title_id'])
         queryset = Comment.objects.filter(review_id=review)
         return queryset

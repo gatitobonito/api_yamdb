@@ -1,21 +1,22 @@
 from rest_framework import serializers
-from django.core.validators import RegexValidator
 from django.db.models import Avg
 
 from reviews.models import (Category, Comment, Genre,
                             Review, Title)
-from reviews.validators import validate_username
+from reviews.validators import (validate_user_username,
+                                validate_username_regexp,
+                                validate_title_year)
 from users.models import User
 
 
 class UserEmailRegistration(serializers.Serializer):
-    NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')
     email = serializers.EmailField(required=True,
                                    max_length=254,
                                    )
     username = serializers.CharField(required=True,
                                      max_length=150,
-                                     validators=[NAME_VALIDATOR]
+                                     validators=[validate_username_regexp(),
+                                                 validate_user_username]
                                      )
 
     def validate(self, value):
@@ -29,9 +30,6 @@ class UserEmailRegistration(serializers.Serializer):
             if not User.objects.filter(email=value['email']).exists():
                 raise serializers.ValidationError(
                     'Вы не можете зарегистрировать другую почту на это имя')
-        if value['username'].lower() == 'me':
-            raise serializers.ValidationError(
-                'Вы не можете зарегистрировать имя me/Me/ME/mE')
         return value
 
 
@@ -92,6 +90,7 @@ class TitleSerializerCrUpDel(serializers.ModelSerializer):
         queryset=Genre.objects.all(), slug_field='slug', many=True)
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(), slug_field='slug')
+    year = serializers.IntegerField(validators=[validate_title_year])
 
     class Meta:
         model = Title

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
-from django.core.validators import RegexValidator
+
+from reviews.validators import validate_username_regexp
 
 ROLES = (
     ('user', 'Пользователь'),
@@ -11,7 +12,6 @@ ROLES = (
 
 
 class User(AbstractUser):
-    NAME_VALIDATOR = RegexValidator(r'^[\w.@+-]+')
     bio = models.TextField(
         blank=True,
     )
@@ -22,9 +22,17 @@ class User(AbstractUser):
     )
     confirmation_code = models.CharField(max_length=60, blank=True)
     username = models.CharField(max_length=150, unique=True,
-                                validators=[NAME_VALIDATOR]
+                                validators=[validate_username_regexp()]
                                 )
     email = models.EmailField(max_length=254, unique=True, blank=False)
+
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
 
     class Meta:
         constraints = [

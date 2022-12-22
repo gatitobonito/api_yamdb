@@ -6,8 +6,14 @@
 
 ### Используемые технологии и библиотеки:
 
-python, requests, Django, sqlite, djangorestframework, PyJWT, pytest, pytest-django, pytest-pythonpath, django-filter, djangorestframework-simplejwt, django-import-export
-
+* Python 
+* Django
+* Django Rest Framework
+* Simple-Jwt
+* Django-Import-Export
+* Requests
+* Sqlite
+* Django-Filters
 ### Установка и настройки:
 
 Создание виртуального окружения:
@@ -95,8 +101,8 @@ http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/
 ```
 ### Разработчики:
 
-1. https://github.com/mrSHISKA
+**[Дмитрий Тепикин](https://github.com/gatitobonito/)**. Управление пользователями: система регистрации и аутентификации, права доступа, работа с токеном, система подтверждения e-mail.
 
-2. https://github.com/gatitobonito/
+**[Максим Титов](https://github.com/mrSHISKA)**. Модели, view и эндпойнты: произведения, категории, жанры. Импорт из csv.
 
-3. https://github.com/vunrise/
+**[Виктория Семеркова](https://github.com/vunrise/)**. Модели, view и эндпойнты: отзывы, комментарии, рейтинг произведений.
